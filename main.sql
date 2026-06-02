@@ -11,10 +11,10 @@ CREATE TABLE Assigned (
     PRIMARY KEY (PilotID,FlightID));
 
 CREATE TABLE Flight (
-    FlightID VARCHAR (10) NOT NULL REFERENCES Assigned,
+    FlightID VARCHAR (10) NOT NULL,
     FlightStatus VARCHAR (10) NOT NULL,
-    Departure VARCHAR (10),
-    Arrival VARCHAR (10),
+    ArrivalTime VARCHAR (10),
+    DepartureTime VARCHAR (10),
     StartAirportID VARCHAR (10),
     EndAirportID VARCHAR (10),
     AircraftID VARCHAR (10) NOT NULL,
@@ -40,6 +40,19 @@ VALUES
 ('PILOT010','Training','Officer'),
 ('PILOT011','Available','Captain'),
 ('PILOT012','Available','Officer');
+
+INSERT INTO Flight (FlightID, FlightStatus,ArrivalTime,DepartureTime,StartAirportID,EndAirportID,AircraftID)
+VALUES
+('FL1001','Scheduled','06:00','08:00','LHR001','AMS006','B737_001'),
+('FL1002','Scheduled','07:30','10:00','AMS006','FRA007','A320_001'),
+('FL1003','Scheduled','11:00','13:00','FRA007','CDG010','A319_001'),
+('FL1004','Delayed','15:00','18:00','CDG010','BCN011','A320_002'),
+('FL1005','Cancelled','09:00','11:00','BCN011','ROM012','A321_001'),
+('FL1006','Scheduled','12:00','14:00','ROM012','DUB005','B737_002'),
+('FL1007','Scheduled','16:00','18:00','DUB005','EDI003','A320_003'),
+('FL1008','Scheduled','19:00','21:00','EDI003','GLA004','A319_002'),
+('FL1009','Scheduled','08:00','10:00','GLA004','MAN002','A320_004'),
+('FL1010','Scheduled','13:00','15:00','MAN002','LHR001','A321_002');
 
 INSERT INTO Assigned (PilotID, FlightID, PilotRole)
 VALUES
@@ -71,20 +84,54 @@ VALUES
 ('BCN011','Open','Barcelona'),
 ('ROM012','Open','Rome');
 
-INSERT INTO Flight (FlightID, FlightStatus,Departure,Arrival,StartAirportID,EndAirportID,Aircraft)
-VALUES
-('FL1001','Scheduled','06:00','08:00','LHR001','AMS006','B737_001'),
-('FL1002','Scheduled','07:30','10:00','AMS006','FRA007','A320_001'),
-('FL1003','Scheduled','11:00','13:00','FRA007','CDG010','A319_001'),
-('FL1004','Delayed','15:00','18:00','CDG010','BCN011','A320_002'),
-('FL1005','Cancelled','09:00','11:00','BCN011','ROM012','A321_001'),
-('FL1006','Scheduled','12:00','14:00','ROM012','DUB005','B737_002'),
-('FL1007','Scheduled','16:00','18:00','DUB005','EDI003','A320_003'),
-('FL1008','Scheduled','19:00','21:00','EDI003','GLA004','A319_002'),
-('FL1009','Scheduled','08:00','10:00','GLA004','MAN002','A320_004'),
-('FL1010','Scheduled','13:00','15:00','MAN002','LHR001','A321_002');
-
 SELECT * FROM Pilot;
 SELECT * FROM Assigned;
 SELECT * FROM Flight;
 SELECT * FROM Airport;
+
+-- Retrieve FlightID based on AircraftID
+SELECT FlightID FROM Flight
+WHERE AircraftID = 'B737_001';
+
+-- Retrieve FlightID based on Departure Airport Location
+SELECT Flight.FlightID FROM Flight
+JOIN Airport ON Flight.StartAirportID = Airport.AirportID
+WHERE Airport.AirportLocation = 'Rome';
+
+-- Retrieve PilotID based on Arrival
+SELECT Assigned.PilotID FROM Assigned
+JOIN Flight ON Assigned.FlightID = Flight.FlightID
+WHERE Flight.EndAirportID = 'AMS006';
+
+-- UpdateStatus of Flights from Dublin
+UPDATE Flight
+SET FlightStatus = 'Delayed'
+WHERE StartAirportID IN (SELECT AirportID FROM Airport
+WHERE AirportLocation = 'Dublin');
+
+-- Check Status has been updated
+SELECT StartAirportID, FlightStatus
+FROM Flight
+WHERE FlightStatus = 'Delayed';
+
+-- Retreive the PilotID of all available Captains
+SELECT PilotID FROM Pilot
+WHERE PilotStatus = 'Available' AND Rank = 'Captain';
+
+-- Assign PILOT002 to be Deputy on FL1010 instead of FL1001 
+UPDATE Assigned
+SET FlightID = 'FL1010', PilotRole = 'Deputy'
+WHERE PilotID = 'PILOT002' AND FlightID = 'FL1001';
+
+-- Check updated assignment works
+SELECT FlightID, PilotRole FROM Assigned
+WHERE PilotID = 'PILOT002';
+
+-- List all departure airports where there is a delay 
+SELECT DISTINCT Airport.*
+FROM Airport
+JOIN Flight ON Airport.AirportID = Flight.StartAirportID
+WHERE Flight.FlightStatus = 'Delayed';
+
+-- Sum the number of flights to Amsterdam
+
