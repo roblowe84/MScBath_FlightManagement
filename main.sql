@@ -103,6 +103,16 @@ SELECT Assigned.PilotID FROM Assigned
 JOIN Flight ON Assigned.FlightID = Flight.FlightID
 WHERE Flight.EndAirportID = 'AMS006';
 
+-- Update EndAirportID for one of the flights
+UPDATE Flight
+SET EndAirportID = 'AMS006'
+WHERE FlightID = 'FL1010';
+
+-- Check Flight has been updated
+SELECT FlightID, EndAirportID
+FROM Flight
+WHERE EndAirportID = 'AMS006';
+
 -- UpdateStatus of Flights from Dublin
 UPDATE Flight
 SET FlightStatus = 'Delayed'
@@ -134,4 +144,12 @@ JOIN Flight ON Airport.AirportID = Flight.StartAirportID
 WHERE Flight.FlightStatus = 'Delayed';
 
 -- Sum the number of flights to Amsterdam
+SELECT COUNT(*) AS FlightsToAmsterdam
+FROM Flight
+WHERE EndAirportID = 'AMS006';
+
+-- Sum the number of flights assigned to PILOT001
+SELECT COUNT(*) AS FlightsAssignedToPILOT001
+FROM Assigned
+WHERE PilotID = 'PILOT001';
 
