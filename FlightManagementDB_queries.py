@@ -1,6 +1,5 @@
 import sqlite3
 
-
 def view_flights(cursor):
     # View all flights and their current status as per the database
     query = '''SELECT DepartureDay, FlightID, FlightStatus, AircraftID FROM Flight'''
@@ -8,13 +7,13 @@ def view_flights(cursor):
     return cursor.fetchall()
 
 def view_specificflight(cursor, FlightID):
-    # View all flights and their current status as per the database
+    # View flights filtered by FlightID and their current status as per the database
     query = '''SELECT DepartureDay, FlightID, FlightStatus, AircraftID FROM Flight WHERE FlightID = ?'''
     cursor.execute(query, (FlightID,))
     return cursor.fetchall()
 
 def update_specificflight(cursor, FlightID, FlightStatus):
-    # Update the Status of a specific flight in the Flight table
+    # Update the Status of a specific flight in the Flight table using FlightID as the key
     query = '''UPDATE Flight
     SET FlightStatus = ? WHERE FlightID = ?'''
     cursor.execute(query, (FlightStatus,FlightID))
@@ -70,7 +69,7 @@ def return_allairports(cursor):
     return cursor.fetchall()
 
 def return_allairportIDs(cursor):
-    # Return all airport IDs which is used for validation routines
+    # Return all airport IDs in the database
     query = '''SELECT AirportID FROM Airport'''
     cursor.execute(query)
     return cursor.fetchall()

@@ -4,7 +4,7 @@ import sqlite3
 # For presentation of output
 from tabulate import tabulate
 
-# Import output from the queries
+# Import functions from the _queries script
 from FlightManagementDB_queries import view_flights, view_pilotschedule, return_allairports, view_departureinformation
 from FlightManagementDB_queries import view_arrivalinformation, return_allaircraft, return_allairportIDs, addnewFlight
 from FlightManagementDB_queries import return_allFlightIDs, view_flights_byDepartureDay, view_flights_byAircraftID
@@ -17,7 +17,7 @@ db = sqlite3.connect('FlightManagementDB.db')
 cursor = db.cursor()
 
 # Run the Main Command Line in a continuous loop until the user selects the Exit Option.
-# All Database Changes are rolled back at the Exit Option
+# All Database Changes are rolled back at the Exit Option - so commit is not applied
 def main_menu():
     while True:
         print("\nWelcome to the Flight Management Database")
@@ -33,7 +33,6 @@ def main_menu():
         choice = input("Select an option: ")
 
         # Validation data sources
-            
         all_FlightIDs = [row[0] for row in return_allFlightIDs(cursor)] # Need to convert tuples from sqlite3 into a list of strings
         all_airportIDs = [row[0] for row in return_allairportIDs(cursor)]
         all_aircraftIDs = [row[0] for row in return_allaircraft(cursor)]
@@ -173,10 +172,11 @@ def main_menu():
             if not rows:
                 print("No flights assigned for " + viewpilotID)
                 continue
-    
+            # Show all allocated flights based on PilotID
             headers = ["FlightID","Departure Day", "Departure Time", "Arrival Time", "From", "To", "Status"]
             print("Pilot Schedule for " + viewpilotID + ":")
             print(tabulate(rows, headers=headers, tablefmt="grid"))
+
             updatePilotSchedule = input("Do you want to update the Pilot schedule? (Y/N): ")
             if updatePilotSchedule == 'N':
                 continue
@@ -189,7 +189,6 @@ def main_menu():
                 if newFlightID not in all_FlightIDs:
                     print("Invalid FlightID.  Please input one of the following valid Flight IDs:")
                     print(all_FlightIDs)
-                    
                 else:
                     break
             
@@ -201,12 +200,10 @@ def main_menu():
                     break
             
             update_PilotAllocation(cursor,newFlightID, newFlightRole, viewpilotID)
-
+            # Return view of flight allocation to pilot after update
             rows = view_pilotschedule(cursor, viewpilotID)
             print("Pilot Schedule for " + viewpilotID + ":")
             print(tabulate(rows, headers=headers, tablefmt="grid"))
-
-            
 
         elif choice == '5': # View Departure Information
             all_rows = return_allairports(cursor)
@@ -218,7 +215,7 @@ def main_menu():
             rows = view_departureinformation(cursor, departureairport)
             if not rows:
                 print("No flights departing from " + departureairport)
-                return
+                continue
 
             headers = ["AirportStatus", "FlightID", "FlightStatus","DepartureDay", "DepartureTime", "AircraftID", "Lead Pilot"]
             print("Departure information for " + departureairport + ":")
@@ -234,7 +231,7 @@ def main_menu():
             rows = view_arrivalinformation(cursor, arrivalairport)
             if not rows:
                 print("No flights arriving into " + arrivalairport)
-                return
+                continue
 
             headers = ["AirportStatus", "FlightID", "FlightStatus", "DepartureDay", "ArrivalTime", "AircraftID", "Lead Pilot"]
             print("Arrival information for " + arrivalairport + ":")
