@@ -18,7 +18,7 @@ def update_specificflight(cursor, FlightID, FlightStatus):
     query = '''UPDATE Flight
     SET FlightStatus = ? WHERE FlightID = ?'''
     cursor.execute(query, (FlightStatus,FlightID))
-    
+
 
 def view_flights_byDepartureDay(cursor,selectedDepartureDay):
     # View flights on a selected departure day
@@ -139,4 +139,8 @@ def addnewFlight(cursor,FlightID,FlightStatus,DepartureTime,ArrivalTime,departur
     cursor.execute(query)
     return cursor.fetchall()
 
-    
+def update_PilotAllocation(cursor, FlightID, Role, PilotID):
+    # Update the Assigned table for Pilot
+    query = '''UPDATE Assigned
+    SET FlightID = ?, PilotRole = ? WHERE PilotID = ?'''
+    cursor.execute(query,(FlightID, Role, PilotID))

@@ -3,7 +3,7 @@ import pytest
 
 # To run in codespace in Terminal type pytest -q
 
-from FlightManagementDB_queries import addnewFlight
+from FlightManagementDB_queries import addnewFlight, update_specificflight
 @pytest.fixture
 def sample_db():
     conn = sqlite3.connect(":memory:")
@@ -51,5 +51,20 @@ def test_addnewFlight_inserts_rows_correctly(sample_db):
     assert inserted[6] =="AMS006"
     assert inserted[7] =="B737_001"
 
+def test_FlightUpdateFunctionality(sample_db):
+    cursor = sample_db.cursor()
 
+    query = '''INSERT INTO Flight VALUES
+    ('FL9999','Pending','09:00','11:00','Thursday','DUB005','AMS006','B737_001')'''
+    cursor.execute(query)
+    sample_db.commit()
+
+    update_specificflight(cursor,'FL9999', 'Cancelled')
+    sample_db.commit()
+    query = '''SELECT FlightStatus FROM Flight WHERE FlightID = "FL9999"'''
+
+    cursor.execute(query)
+    test_flightstatus = cursor.fetchone()[0]
+  
+    assert test_flightstatus == 'Cancelled'
     
