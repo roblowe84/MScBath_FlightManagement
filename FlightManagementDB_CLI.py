@@ -39,6 +39,7 @@ def main_menu():
             all_airportIDs = [row[0] for row in return_allairportIDs(cursor)]
             all_aircraftIDs = [row[0] for row in return_allaircraft(cursor)]
             valid_statuses = {"Scheduled","Delayed","Cancelled","Pending"}
+            valid_departureday = {"Monday", "Tuesday", "Wednesday","Thursday","Friday"}
             
             # Validate there are no duplicate Flight IDs added to the database
             while True:
@@ -56,9 +57,18 @@ def main_menu():
                 else:
                     print("Invalid status. Please enter one of: Scheduled, Delayed, Cancelled, Pending.")
 
-            # Future improvement - to include days and validation on inputs for Time
+            # Future improvement - to include validation on inputs for Time
             DepartureTime = input("Insert Departure Time (i.e. 08:00): ")
             ArrivalTime = input("Insert Arrival Time (i.e. 08:00): ")
+            
+            # Only allow valid departure days with the assumptions flights operate only on Monday - Fridays
+            while True:
+                departureDay = input("Insert departure day: ")
+            
+                if departureDay in valid_departureday:
+                    break
+                else:
+                    print("Invalid departure day. Please enter one of: Monday, Tuesday, Wednesday, Thursday, Friday.")
             
             # Only allow valid Airport and Aircraft IDs to be input by user
             # Not yet option to add new Airport or Aircraft IDs
@@ -88,9 +98,9 @@ def main_menu():
                     print(all_aircraftIDs)
 
             # Add the new flight to the database and return the updated database so user can see the addition
-            all_rows = addnewFlight(cursor,FlightID,FlightStatus,DepartureTime,ArrivalTime,StartAirportID,EndAirportID,AircraftID)
+            all_rows = addnewFlight(cursor,FlightID,FlightStatus,DepartureTime,ArrivalTime,departureDay, StartAirportID,EndAirportID,AircraftID)
             
-            headers = ["FlightID", "FlightStatus", "DepartureTime", "ArrivalTime", "StartAirportID", "EndAirportID","AircraftID"]
+            headers = ["FlightID", "FlightStatus", "DepartureTime", "ArrivalTime", "DepartureDay" "StartAirportID", "EndAirportID","AircraftID"]
             print("Full Flight List:")
             print(tabulate(all_rows, headers=headers, tablefmt="grid"))
 
@@ -117,7 +127,7 @@ def main_menu():
                 print("No flights assigned for " + viewpilotID)
                 return
     
-            headers = ["FlightID", "Departure", "Arrival", "From", "To", "Status"]
+            headers = ["FlightID","Departure Day", "Departure Time", "Arrival Time", "From", "To", "Status"]
             print("Pilot Schedule for " + viewpilotID + ":")
             print(tabulate(rows, headers=headers, tablefmt="grid"))
 
@@ -133,7 +143,7 @@ def main_menu():
                 print("No flights departing from " + departureairport)
                 return
 
-            headers = ["AirportStatus", "FlightID", "FlightStatus", "DepartureTime", "AircraftID", "Lead Pilot"]
+            headers = ["AirportStatus", "FlightID", "FlightStatus","DepartureDay", "DepartureTime", "AircraftID", "Lead Pilot"]
             print("Departure information for " + departureairport + ":")
             print(tabulate(rows, headers=headers, tablefmt="grid"))
         
@@ -149,7 +159,7 @@ def main_menu():
                 print("No flights arriving into " + arrivalairport)
                 return
 
-            headers = ["AirportStatus", "FlightID", "FlightStatus", "ArrivalTime", "AircraftID", "Lead Pilot"]
+            headers = ["AirportStatus", "FlightID", "FlightStatus", "DepartureDay", "ArrivalTime", "AircraftID", "Lead Pilot"]
             print("Arrival information for " + arrivalairport + ":")
             print(tabulate(rows, headers=headers, tablefmt="grid"))
 

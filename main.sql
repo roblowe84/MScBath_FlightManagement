@@ -15,6 +15,7 @@ CREATE TABLE Flight (
     FlightStatus VARCHAR (10) NOT NULL,
     ArrivalTime VARCHAR (10),
     DepartureTime VARCHAR (10),
+    DepartureDay VARCHAR (10),
     StartAirportID VARCHAR (10),
     EndAirportID VARCHAR (10),
     AircraftID VARCHAR (10) NOT NULL,
@@ -41,18 +42,18 @@ VALUES
 ('PILOT011','Available','Captain'),
 ('PILOT012','Available','Officer');
 
-INSERT INTO Flight (FlightID, FlightStatus,ArrivalTime,DepartureTime,StartAirportID,EndAirportID,AircraftID)
+INSERT INTO Flight (FlightID, FlightStatus,ArrivalTime,DepartureTime,DepartureDay,StartAirportID,EndAirportID,AircraftID)
 VALUES
-('FL1001','Scheduled','06:00','08:00','LHR001','AMS006','B737_001'),
-('FL1002','Scheduled','07:30','10:00','AMS006','FRA007','A320_001'),
-('FL1003','Scheduled','11:00','13:00','FRA007','CDG010','A319_001'),
-('FL1004','Delayed','15:00','18:00','CDG010','BCN011','A320_002'),
-('FL1005','Cancelled','09:00','11:00','BCN011','ROM012','A321_001'),
-('FL1006','Scheduled','12:00','14:00','ROM012','DUB005','B737_002'),
-('FL1007','Scheduled','16:00','18:00','DUB005','EDI003','A320_003'),
-('FL1008','Scheduled','19:00','21:00','EDI003','GLA004','A319_002'),
-('FL1009','Scheduled','08:00','10:00','GLA004','MAN002','A320_004'),
-('FL1010','Scheduled','13:00','15:00','MAN002','LHR001','A321_002');
+('FL1001','Scheduled','06:00','08:00','Monday','LHR001','AMS006','B737_001'),
+('FL1002','Scheduled','07:30','10:00','Monday','AMS006','FRA007','A320_001'),
+('FL1003','Scheduled','11:00','13:00','Tuesday','FRA007','CDG010','A319_001'),
+('FL1004','Delayed','15:00','18:00','Tuesday','CDG010','BCN011','A320_002'),
+('FL1005','Cancelled','09:00','11:00','Tuesday','BCN011','ROM012','A321_001'),
+('FL1006','Scheduled','12:00','14:00','Wednesday','ROM012','DUB005','B737_002'),
+('FL1007','Scheduled','16:00','18:00','Wednesday','DUB005','EDI003','A320_003'),
+('FL1008','Scheduled','19:00','21:00','Thursday','EDI003','GLA004','A319_002'),
+('FL1009','Scheduled','08:00','10:00','Thursday','GLA004','MAN002','A320_004'),
+('FL1010','Scheduled','13:00','15:00','Friday','MAN002','LHR001','A321_002');
 
 INSERT INTO Assigned (PilotID, FlightID, PilotRole)
 VALUES

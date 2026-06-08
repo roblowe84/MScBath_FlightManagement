@@ -12,6 +12,7 @@ def view_pilotschedule(cursor, viewpilotID):
     query = '''
         SELECT 
             Flight.FlightID,
+            Flight.DepartureDay,
             Flight.DepartureTime,
             Flight.ArrivalTime,
             Flight.StartAirportID,
@@ -41,6 +42,7 @@ def view_departureinformation(cursor, departureairport):
                 Airport.AirportStatus,
                 Flight.FlightID,
                 Flight.FlightStatus,
+                Flight.DepartureDay,
                 Flight.DepartureTime,
                 Flight.AircraftID,
                 Assigned.PilotID
@@ -60,18 +62,19 @@ def view_arrivalinformation(cursor,arrivalairport):
                 Airport.AirportStatus,
                 Flight.FlightID,
                 Flight.FlightStatus,
+                Flight.DepartureDay,
                 Flight.ArrivalTime,
                 Flight.AircraftID,
                 Assigned.PilotID
                 FROM Flight
                 JOIN Airport
-                    ON Flight.EndAirportID = Airport.AirportID
+                    ON TRIM(Flight.EndAirportID) = TRIM(Airport.AirportID)
                 LEFT JOIN Assigned
                     ON Assigned.FlightID = Flight.FlightID
                     AND Assigned.PilotRole = 'Lead'
-                WHERE Airport.AirportLocation = ?'''
+                WHERE TRIM(Airport.AirportLocation) = TRIM(?)'''
     cursor.execute(query, (arrivalairport,))
-    rows = cursor.fetchall()
+    return cursor.fetchall()
 
 def return_allaircraft(cursor):
     # Return all aircraft IDs which is used for validation routines
@@ -86,14 +89,14 @@ def return_allFlightIDs(cursor):
     return cursor.fetchall()
 
 
-def addnewFlight(cursor,FlightID,FlightStatus,DepartureTime,ArrivalTime,StartAirportID,EndAirportID,AircraftID):
+def addnewFlight(cursor,FlightID,FlightStatus,DepartureTime,ArrivalTime,departureDay,StartAirportID,EndAirportID,AircraftID):
     # Add a new Flight based on User Input
-    query = '''INSERT INTO Flight(FlightID,FlightStatus,DepartureTime,ArrivalTime,StartAirportID, EndAirportID, AircraftID)
-    VALUES(?,?,?,?,?,?,?)'''
-    cursor.execute(query,(FlightID,FlightStatus,DepartureTime,ArrivalTime,StartAirportID, EndAirportID,AircraftID))
+    query = '''INSERT INTO Flight(FlightID,FlightStatus,DepartureTime,ArrivalTime,departureDay, StartAirportID, EndAirportID, AircraftID)
+    VALUES(?,?,?,?,?,?,?,?)'''
+    cursor.execute(query,(FlightID,FlightStatus,DepartureTime,ArrivalTime,departureDay,StartAirportID, EndAirportID,AircraftID))
 
     # Return the latest Flight Data so user can view the update made
-    query = '''SELECT FlightID, FlightStatus, DepartureTime, ArrivalTime,StartAirportID,EndAirportID, AircraftID FROM Flight'''
+    query = '''SELECT FlightID, FlightStatus, DepartureTime, ArrivalTime,departureDay, StartAirportID,EndAirportID, AircraftID FROM Flight'''
     cursor.execute(query)
     return cursor.fetchall()
 
