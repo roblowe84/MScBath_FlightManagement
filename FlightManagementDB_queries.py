@@ -3,8 +3,34 @@ import sqlite3
 
 def view_flights(cursor):
     # View all flights and their current status as per the database
-    query = '''SELECT FlightID, FlightStatus FROM Flight'''
+    query = '''SELECT DepartureDay, FlightID, FlightStatus, AircraftID FROM Flight'''
     cursor.execute(query)
+    return cursor.fetchall()
+
+def view_flights_byDepartureDay(cursor,selectedDepartureDay):
+    # View flights on a selected departure day
+    query = '''
+        SELECT 
+            DepartureDay,
+            FlightID,
+            FlightStatus,
+            AircraftID
+            FROM Flight
+        WHERE DepartureDay = ?'''
+    cursor.execute(query,(selectedDepartureDay,))
+    return cursor.fetchall()
+
+def view_flights_byAircraftID(cursor,selectedAircraftID):
+    # View flights by selected AircraftID
+    query = '''
+        SELECT 
+            DepartureDay,
+            FlightID,
+            FlightStatus,
+            AircraftID
+            FROM Flight
+        WHERE AircraftID = ?'''
+    cursor.execute(query,(selectedAircraftID,))
     return cursor.fetchall()
 
 def view_pilotschedule(cursor, viewpilotID):
