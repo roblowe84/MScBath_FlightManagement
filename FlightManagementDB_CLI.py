@@ -86,7 +86,7 @@ def main_menu():
                 else:
                     print("Invalid Aircraft ID. Please input one of the following valid Aircraft IDs: ")
                     print(all_aircraftIDs)
-                    
+
             # Add the new flight to the database and return the updated database so user can see the addition
             all_rows = addnewFlight(cursor,FlightID,FlightStatus,DepartureTime,ArrivalTime,StartAirportID,EndAirportID,AircraftID)
             
@@ -95,9 +95,20 @@ def main_menu():
             print(tabulate(all_rows, headers=headers, tablefmt="grid"))
 
         elif choice == '2': # View all flights
-            all_rows = view_flights(cursor)
-            for row in all_rows:
-                print(row[0] + ' : ' + row[1])
+            while True:
+                viewallflights = input("View all flights? (Y/N): ")
+
+                if viewallflights == 'Y':
+                    all_rows = view_flights(cursor)
+                    for row in all_rows:
+                        print(row[0] + ' : ' + row[1])
+                    break
+                elif viewallflights == 'N':
+                    print("To include functionality")
+                    break
+                else:
+                    print("Invalid option, please input 'Y' to view all flights or 'N' to view flights by criteria")
+         
             
         elif choice == '5': # View Pilot Schedule
             viewpilotID = input("Enter PilotID (i.e. PILOT001): ")
