@@ -3,9 +3,10 @@ import pytest
 
 # To run in codespace in Terminal type pytest -q
 
-from FlightManagementDB_queries import addnewFlight, update_specificflight
+from FlightManagementDB_queries import addnewFlight, update_specificflight, update_PilotAllocation
 @pytest.fixture
 def sample_db():
+    #Setup sample table for purposes of testing addnewFlight
     conn = sqlite3.connect(":memory:")
     cursor = conn.cursor()
 
@@ -28,6 +29,7 @@ def sample_db():
 def test_addnewFlight_inserts_rows_correctly(sample_db):
     cursor = sample_db.cursor()
 
+    # Send test data to addnewFlight function
     rows = addnewFlight(cursor,
                         FlightID="FL9999",
                         FlightStatus="Pending",
@@ -54,11 +56,13 @@ def test_addnewFlight_inserts_rows_correctly(sample_db):
 def test_FlightUpdateFunctionality(sample_db):
     cursor = sample_db.cursor()
 
+    # Update table with sample data
     query = '''INSERT INTO Flight VALUES
     ('FL9999','Pending','09:00','11:00','Thursday','DUB005','AMS006','B737_001')'''
     cursor.execute(query)
     sample_db.commit()
 
+    # Test update_specificflight by passing in a change in flight status
     update_specificflight(cursor,'FL9999', 'Cancelled')
     sample_db.commit()
     query = '''SELECT FlightStatus FROM Flight WHERE FlightID = "FL9999"'''
@@ -67,4 +71,30 @@ def test_FlightUpdateFunctionality(sample_db):
     test_flightstatus = cursor.fetchone()[0]
   
     assert test_flightstatus == 'Cancelled'
-    
+
+def test_updated_PilotAllocation(sample_db):
+    cursor = sample_db.cursor()
+
+    # Create sample Assigned Table
+    query = ''' CREATE TABLE Assigned (
+                PilotID VARCHAR (10),
+                FlightID VARCHAR (10),
+                PilotRole VARCHAR (10),
+                PRIMARY KEY (PilotID, FlightID))'''
+    cursor.execute(query)
+
+    # Insert initial assignment
+    query = '''INSERT INTO Assigned (PilotID, FlightID, PilotRole)
+                VALUES ('PILOT001','FL1001','Lead')'''
+    cursor.execute(query)
+    sample_db.commit()
+
+    # Update the Assignment
+    update_PilotAllocation(cursor,FlightID='FL1002', Role = 'Deputy', PilotID='PILOT001')
+    sample_db.commit()
+
+    query = '''SELECT PilotiD, FlightID, PilotRole FROM Assigned'''
+    cursor.execute(query)
+    row = cursor.fetchone()
+
+    assert row == ('PILOT001', 'FL1002', 'Deputy')
