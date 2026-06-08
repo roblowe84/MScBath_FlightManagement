@@ -7,6 +7,19 @@ def view_flights(cursor):
     cursor.execute(query)
     return cursor.fetchall()
 
+def view_specificflight(cursor, FlightID):
+    # View all flights and their current status as per the database
+    query = '''SELECT DepartureDay, FlightID, FlightStatus, AircraftID FROM Flight WHERE FlightID = ?'''
+    cursor.execute(query, (FlightID,))
+    return cursor.fetchall()
+
+def update_specificflight(cursor, FlightID, FlightStatus):
+    # Update the Status of a specific flight in the Flight table
+    query = '''UPDATE Flight
+    SET FlightStatus = ? WHERE FlightID = ?'''
+    cursor.execute(query, (FlightStatus,FlightID))
+    
+
 def view_flights_byDepartureDay(cursor,selectedDepartureDay):
     # View flights on a selected departure day
     query = '''
